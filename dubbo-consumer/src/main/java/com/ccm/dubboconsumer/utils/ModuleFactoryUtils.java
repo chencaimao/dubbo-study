@@ -11,7 +11,7 @@ import com.ccm.dubboconsumer.service.IntelChargeModule.SalaryModuleServiceImpl;
  */
 public class ModuleFactoryUtils {
     public static ModuleService buildFactoryByType(int type){
-        if(type== ModuleEnum.INVOICE.getModuleCode())
+        if(type == ModuleEnum.INVOICE.getModuleCode())
             return new InvoiceModuleServiceImpl();
         if(type==ModuleEnum.SALARY.getModuleCode())
             return new SalaryModuleServiceImpl();
