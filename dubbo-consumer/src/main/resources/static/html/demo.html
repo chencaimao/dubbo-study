@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+</head>
+<body>
+<p>demo </p>
+<p>当前登陆名：<span id="userName"></span><input id="userId" type="hidden"/><button onclick="logout()">登出</button></p>
+<input id="text" type="text" />
+<button onclick="send()">发送</button>
+<button onclick="connectWebSocket()">上线</button>
+<button onclick="closeWebSocket()">下线</button>
+<div id="message">
+</div>
+<script src="js/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script th:inline="javascript">
+    window.onload = function(){
+        $.ajax({
+            type:"GET",
+            url:"/getCurrentUser",
+            success:function(response){
+                if(response.code!=null &&response.code==="0"){
+                    console.log(response);
+                    console.log(response.result.userId);
+                    $("#userName").html(response.result.userName);
+                    $("#userId").val(response.result.userId);
+                }else{
+                    console.log("获取当前用户失败："+response.message);
+                }
+            },error:function(response){
+                console.log("请求异常："+response.message);
+            }
+        });
+    };
+
+    function logout(){
+        $.ajax({
+            type:"GET",
+            url:"/logout",
+            success:function(response){
+                if(response.code!=null &&response.code==="0"){
+                    console.log(response);
+                    location.href="/login.html";
+                }else{
+                    console.log("登出失败："+response.message);
+                }
+            },error:function(response){
+                console.log("请求异常："+response.message);
+            }
+        });
+    }
+    var websocket = null;
+
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML){
+        var orgiVal=$("#message").html();
+        $('#message').html( orgiVal+ innerHTML + '<br/>');
+    }
+
+    //连接
+    function connectWebSocket(){
+        //判断当前浏览器是否支持WebSocket
+        if('WebSocket' in window){
+            if(websocket!=null){
+                alert("已经建立连接!");
+                return;
+            }
+            $.ajax({
+                type:"GET",
+                url:"/userOnline?userId="+$("#userId").val(),
+                success:function(response){
+                    if(response.code!=null &&response.code==="0"){
+                        if(response.result===true){
+                            alert("用户已在线,无法再建立连接!");
+                        }else{
+                            websocket = new WebSocket("ws://localhost:9105/webSocket/"+$("#userId").val());
+                            //连接发生错误的回调方法
+                            websocket.onerror = function(){
+                                setMessageInnerHTML("连接错误");
+                            };
+
+                            //连接成功建立的回调方法
+                            websocket.onopen = function(event){
+                                setMessageInnerHTML("连接成功");
+                            };
+
+                            //接收到消息的回调方法
+                            websocket.onmessage = function(event){
+                                setMessageInnerHTML("收到消息："+event.data);
+                            };
+
+                            //连接关闭的回调方法
+                            websocket.onclose = function(){
+                                setMessageInnerHTML("连接关闭");
+                            };
+
+                            //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+                            window.onbeforeunload = function(){
+                                websocket.close();
+                            };
+                        }
+                    }else{
+                        console.log("判断用户是否在线失败："+response.message);
+                    }
+                },error:function(response){
+                    console.log("请求异常："+response.message);
+                }
+            });
+        }
+        else{
+            alert('Not support websocket');
+        }
+    }
+
+    //关闭连接
+    function closeWebSocket(){
+        if(websocket==null){
+            alert("没有建立连接，无法关闭!");
+            return;
+        }
+        websocket.close();
+        websocket=null;
+    }
+
+    //发送消息
+    function send(){
+        if(websocket==null){
+            alert("请先建立连接再发送消息!");
+            return;
+        }
+        var message = $("#text").val();
+        websocket.send(message);
+    }
+</script>
+</body>
+
+</html>
