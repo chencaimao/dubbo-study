@@ -16,5 +16,7 @@ public class ModuleFactoryUtils {
         if(type==ModuleEnum.SALARY.getModuleCode())
             return new SalaryModuleServiceImpl();
         return new InvoiceModuleServiceImpl();
+
+        
     }
 }
