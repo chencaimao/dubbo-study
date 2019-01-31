@@ -5,6 +5,7 @@ import com.ccm.dubbobeans.enums.ResultEnum;
 import com.ccm.dubbobeans.result.AjaxResult;
 import com.ccm.dubbobeans.vo.UserVo;
 import com.ccm.dubboconsumer.component.RedisComponent;
+import com.ccm.dubboconsumer.service.IntelChargeModule.ModuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,17 @@ import java.util.Map;
 public class RedisTest {
     @Autowired
     private RedisComponent redisComponent;
+    @Resource(name="InvoiceModuleServiceImpl")
+    private ModuleService moduleService;
+
+    @Test
+    public void testXXX(){
+        try{
+            moduleService.intelCharge();
+        }catch (Exception ex){
+            log.error(ex.getMessage());
+        }
+    }
 //    -----------------------optvalue---------------------
     @Test
     public void testSet(){

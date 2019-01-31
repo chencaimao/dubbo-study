@@ -36,7 +36,7 @@
         from user
         where user_id=#{id,jdbcType=VARCHAR}
     </select>
-    <select id="findFirst" parameterType="java.util.Map" resultMap="BaseResultMap">
+    <select id="findAll" parameterType="java.util.Map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from user

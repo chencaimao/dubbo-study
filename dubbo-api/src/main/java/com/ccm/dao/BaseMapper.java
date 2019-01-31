@@ -38,7 +38,7 @@ public interface BaseMapper<T,DbIdKey> {
      *
      * @return
      */
-    List<T> findAll();
+    List<T> findAll(Map<String, Object> map);
 
     /**
      * 查询全部
